@@ -2,7 +2,7 @@ import {
   Card,
   Center,
   Container,
-  Divider,
+  Grid,
   Group,
   NumberInput,
   SimpleGrid,
@@ -11,12 +11,10 @@ import {
   Title
 } from "@mantine/core";
 import { startTransition, useEffect, useMemo, useState } from "react";
+import { useHoverState } from "./hover-state";
 import { generateAmortizationSchedule } from "./loanCalculations";
 import PieChartForRow from "./PieChartForRow";
 import ScheduleTable from "./ScheduleTable";
-import { formatCurrency } from "./utils";
-import { Grid } from "@mantine/core";
-import { useHoverState } from "./hover-state";
 import Summary from "./Summary";
 
 const integerFormatter = new Intl.NumberFormat("pl-PL");
@@ -115,9 +113,7 @@ function App() {
           </Stack>
         </Card>
 
-        <Card withBorder padding="md">
-          <Summary result={result} overpayment={overpayment} />
-        </Card>
+        <Summary result={result} overpayment={overpayment} />
 
         <Card withBorder padding="md">
           <Stack gap="md">
