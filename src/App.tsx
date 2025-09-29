@@ -17,6 +17,7 @@ import ScheduleTable from "./ScheduleTable";
 import { formatCurrency } from "./utils";
 import { Grid } from "@mantine/core";
 import { useHoverState } from "./hover-state";
+import Summary from "./Summary";
 
 const integerFormatter = new Intl.NumberFormat("pl-PL");
 
@@ -48,7 +49,6 @@ function App() {
   const numericAnnualInterest =
     typeof annualInterest === "number" ? annualInterest : 0;
   const numericYears = typeof years === "number" ? years : 0;
-  const numericOverpayment = typeof overpayment === "number" ? overpayment : 0;
 
   const result = useMemo(
     () =>
@@ -56,9 +56,9 @@ function App() {
         principal: numericPrincipal,
         annualInterestRate: numericAnnualInterest,
         years: numericYears,
-        monthlyOverpayment: numericOverpayment
+        monthlyOverpayment: Number(overpayment)
       }),
-    [numericPrincipal, numericAnnualInterest, numericYears, numericOverpayment]
+    [numericPrincipal, numericAnnualInterest, numericYears, overpayment]
   );
 
   // Change const setHoverState = useHoverState((s) => s.setHoverState); after every input change
@@ -68,9 +68,6 @@ function App() {
   }, [result]);
 
   console.log(result);
-
-  const payoffYears = Math.floor(result.payoffMonths / 12);
-  const payoffMonthsRemainder = result.payoffMonths % 12;
 
   return (
     <Container size="xl" py="xl">
@@ -85,7 +82,7 @@ function App() {
 
         <Card withBorder padding="md">
           <Stack gap="lg">
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+            <SimpleGrid cols={{ xs: 1, sm: 2, md: 4 }} spacing="lg">
               <NumberInput
                 label="Kwota kredytu (PLN)"
                 value={principal}
@@ -119,50 +116,7 @@ function App() {
         </Card>
 
         <Card withBorder padding="md">
-          <Stack gap="sm">
-            <Title order={3}>Podsumowanie</Title>
-            <Text fw={600} size="lg">
-              Miesięczna rata (z nadpłatą):{" "}
-              {formatCurrency(result.actualFirstPayment)}
-            </Text>
-            <Text c="dimmed" size="sm">
-              Podstawowa rata (bez nadpłaty):{" "}
-              {formatCurrency(result.monthlyPayment)}
-            </Text>
-            {result.firstPaymentBreakdown && (
-              <Stack gap={4} pt="xs">
-                <Text size="sm">
-                  Kapitał:{" "}
-                  {formatCurrency(result.firstPaymentBreakdown.capital)}
-                </Text>
-                <Text size="sm">
-                  Odsetki:{" "}
-                  {formatCurrency(result.firstPaymentBreakdown.interest)}
-                </Text>
-                {numericOverpayment > 0 && (
-                  <Text size="sm">
-                    Nadpłata:{" "}
-                    {formatCurrency(result.firstPaymentBreakdown.overpayment)}
-                  </Text>
-                )}
-              </Stack>
-            )}
-            <Divider my="sm" />
-            <Group gap="md" wrap="wrap">
-              <Text size="sm">
-                Czas spłaty:{" "}
-                {result.payoffMonths
-                  ? `${result.payoffMonths} mies. (${payoffYears} lat ${payoffMonthsRemainder} mies.)`
-                  : "-"}
-              </Text>
-              <Text size="sm">
-                Całkowite odsetki: {formatCurrency(result.totalInterestPaid)}
-              </Text>
-              <Text size="sm">
-                Całkowita spłacona kwota: {formatCurrency(result.totalPaid)}
-              </Text>
-            </Group>
-          </Stack>
+          <Summary result={result} overpayment={overpayment} />
         </Card>
 
         <Card withBorder padding="md">
