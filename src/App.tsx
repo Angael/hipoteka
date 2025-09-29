@@ -1,6 +1,7 @@
 import {
   Card,
   Center,
+  Checkbox,
   Container,
   Grid,
   Group,
@@ -106,6 +107,13 @@ function App() {
                 onChange={createNumberInputChangeHandler(setOverpayment)}
                 min={0}
                 step={100}
+              />
+              <Checkbox
+                checked={true}
+                onChange={console.log}
+                label="Stałe oprocentowanie"
+                disabled
+                m="xs"
               />
             </SimpleGrid>
           </Stack>
