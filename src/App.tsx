@@ -74,7 +74,7 @@ function App() {
 
   return (
     <Container size="xl" py="xl">
-      <Stack gap="xl">
+      <Stack gap="md">
         <div>
           <Title order={1}>Kalkulator hipoteki</Title>
           <Text c="dimmed">
@@ -83,7 +83,7 @@ function App() {
           </Text>
         </div>
 
-        <Card withBorder padding="xl">
+        <Card withBorder padding="md">
           <Stack gap="lg">
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
               <NumberInput
@@ -118,7 +118,7 @@ function App() {
           </Stack>
         </Card>
 
-        <Card withBorder padding="xl">
+        <Card withBorder padding="md">
           <Stack gap="sm">
             <Title order={3}>Podsumowanie</Title>
             <Text fw={600} size="lg">
@@ -165,7 +165,7 @@ function App() {
           </Stack>
         </Card>
 
-        <Card withBorder padding="xl">
+        <Card withBorder padding="md">
           <Stack gap="md">
             <Group justify="space-between" align="flex-end">
               <Title order={3}>Harmonogram spłat</Title>
