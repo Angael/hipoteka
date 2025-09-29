@@ -6,6 +6,7 @@ export const useHoverState = create<{
   setHoverState: (row: AmortizationRow) => void;
 }>((set) => ({
   hoveredRow: {
+    id: "null",
     month: 0,
     payment: 0,
     interest: 0,

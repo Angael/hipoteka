@@ -65,8 +65,6 @@ function App() {
     setHoverState(result.schedule[0] || null);
   }, [result]);
 
-  console.log(result);
-
   return (
     <Container size="xl" py="xl">
       <Stack gap="md">

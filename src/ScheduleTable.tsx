@@ -1,15 +1,15 @@
 import { ScrollArea, Table, Text } from "@mantine/core";
-import type { AmortizationRow } from "./loanCalculations";
-import { memo, startTransition } from "react";
-import { formatCurrency } from "./utils";
+import { memo } from "react";
 import { useHoverState } from "./hover-state";
+import type { AmortizationRow } from "./loanCalculations";
+import ScheduleTableRow from "./ScheduleTableRow";
 
 type Props = {
   schedule: AmortizationRow[];
 };
 
 const ScheduleTable = ({ schedule }: Props) => {
-  const setHoverState = useHoverState((s) => s.setHoverState);
+  const { hoveredRow, setHoverState } = useHoverState();
 
   return (
     <ScrollArea h={400} type="hover">
@@ -34,18 +34,13 @@ const ScheduleTable = ({ schedule }: Props) => {
               </Table.Td>
             </Table.Tr>
           ) : (
-            schedule.slice(0, 600).map((row) => (
-              <Table.Tr
-                key={row.month}
-                onMouseEnter={() => startTransition(() => setHoverState(row))}
-              >
-                <Table.Td>{row.month}</Table.Td>
-                <Table.Td>{formatCurrency(row.remainingBalance)}</Table.Td>
-                <Table.Td>{formatCurrency(row.payment)}</Table.Td>
-                <Table.Td>{formatCurrency(row.principal)}</Table.Td>
-                <Table.Td>{formatCurrency(row.interest)}</Table.Td>
-                <Table.Td>{formatCurrency(row.overpayment)}</Table.Td>
-              </Table.Tr>
+            schedule.map((row) => (
+              <ScheduleTableRow
+                key={row.id}
+                row={row}
+                isHovered={hoveredRow.month === row.month}
+                onMouseEnter={setHoverState}
+              />
             ))
           )}
         </Table.Tbody>

@@ -6,6 +6,7 @@ export interface LoanParameters {
 }
 
 export interface AmortizationRow {
+  id: string;
   month: number;
   payment: number;
   interest: number;
@@ -123,6 +124,7 @@ export function generateAmortizationSchedule({
     totalPaid += totalPayment;
 
     schedule.push({
+      id: Math.random().toString(16).slice(2),
       month,
       payment: toCents(totalPayment),
       interest: toCents(interestPayment),
