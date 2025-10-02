@@ -4,7 +4,6 @@ import {
   Checkbox,
   Container,
   Grid,
-  Group,
   NumberInput,
   SimpleGrid,
   Stack,
@@ -17,8 +16,6 @@ import { generateAmortizationSchedule } from "./loanCalculations";
 import PieChartForRow from "./PieChartForRow";
 import ScheduleTable from "./ScheduleTable";
 import Summary from "./Summary";
-
-const integerFormatter = new Intl.NumberFormat("pl-PL");
 
 const createNumberInputChangeHandler =
   (setter: (value: number | "") => void) => (value: string | number) =>
@@ -40,7 +37,7 @@ const createNumberInputChangeHandler =
 
 function App() {
   const [principal, setPrincipal] = useState<number | "">(580_000);
-  const [annualInterest, setAnnualInterest] = useState<number | "">(6.5);
+  const [annualInterest, setAnnualInterest] = useState<number | "">(6);
   const [years, setYears] = useState<number | "">(30);
   const [overpayment, setOverpayment] = useState<number | "">(1_400);
 
@@ -60,10 +57,13 @@ function App() {
     [numericPrincipal, numericAnnualInterest, numericYears, overpayment]
   );
 
-  // Change const setHoverState = useHoverState((s) => s.setHoverState); after every input change
   useEffect(() => {
-    const { setHoverState } = useHoverState.getState();
-    setHoverState(result.schedule[0] || null);
+    const { setHoverState, resetHoverState } = useHoverState.getState();
+    if (result.schedule[0]) {
+      setHoverState(result.schedule[0]);
+    } else {
+      resetHoverState();
+    }
   }, [result]);
 
   return (
@@ -119,16 +119,11 @@ function App() {
           </Stack>
         </Card>
 
-        <Summary result={result} overpayment={overpayment} />
+        <Summary result={result} />
 
         <Card withBorder padding="md">
           <Stack gap="md">
-            <Group justify="space-between" align="flex-end">
-              <Title order={3}>Harmonogram spłat</Title>
-              <Text size="sm" c="dimmed">
-                Łącznie {integerFormatter.format(result.schedule.length)} rat
-              </Text>
-            </Group>
+            <Title order={3}>Harmonogram spłat</Title>
 
             <Grid>
               <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>

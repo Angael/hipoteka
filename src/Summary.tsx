@@ -1,6 +1,6 @@
 import {
   Divider,
-  Group,
+  // Group,
   Stack,
   Text,
   Title,
@@ -14,13 +14,11 @@ import { AreaChart } from "@mantine/charts";
 
 type Props = {
   result: LoanComputationResult;
-  overpayment: number | "";
 };
 
-const Summary = ({ result, overpayment }: Props) => {
+const Summary = ({ result }: Props) => {
   const payoffYears = Math.floor(result.payoffMonths / 12);
   const payoffMonthsRemainder = result.payoffMonths % 12;
-  const numericOverpayment = Number(overpayment);
 
   const chartData = useMemo(
     () =>
@@ -64,48 +62,60 @@ const Summary = ({ result, overpayment }: Props) => {
           />
         </Stack>
       </Card>
+
       <Card withBorder padding="md">
         <Stack gap="sm">
           <Title order={3}>Podsumowanie</Title>
-          <Text fw={600} size="lg">
-            Miesięczna rata (z nadpłatą):{" "}
-            {formatCurrency(result.actualFirstPayment)}
-          </Text>
-          <Text c="dimmed" size="sm">
-            Podstawowa rata (bez nadpłaty):{" "}
-            {formatCurrency(result.monthlyPayment)}
-          </Text>
-          {result.firstPaymentBreakdown && (
-            <Stack gap={4} pt="xs">
-              <Text size="sm">
-                Kapitał: {formatCurrency(result.firstPaymentBreakdown.capital)}
+
+          <div>
+            <Text size="md">
+              Miesięczna rata (z nadpłatą):{" "}
+              <Text span fw={600}>
+                {formatCurrency(result.actualFirstPayment)}
               </Text>
-              <Text size="sm">
-                Odsetki: {formatCurrency(result.firstPaymentBreakdown.interest)}
+            </Text>
+
+            <Text c="dimmed" size="sm">
+              Podstawowa rata (bez nadpłaty):{" "}
+              <Text span fw={600}>
+                {formatCurrency(result.monthlyPayment)}
               </Text>
-              {numericOverpayment > 0 && (
-                <Text size="sm">
-                  Nadpłata:{" "}
-                  {formatCurrency(result.firstPaymentBreakdown.overpayment)}
-                </Text>
-              )}
-            </Stack>
-          )}
+            </Text>
+          </div>
+
+          <Text size="md">
+            Czas spłaty:{" "}
+            <Text span fw={600}>
+              {`${result.payoffMonths} mies. (${payoffYears} lat ${payoffMonthsRemainder} mies.)`}
+            </Text>
+          </Text>
+
           <Divider my="sm" />
-          <Group gap="md" wrap="wrap">
-            <Text size="sm">
-              Czas spłaty:{" "}
-              {result.payoffMonths
-                ? `${result.payoffMonths} mies. (${payoffYears} lat ${payoffMonthsRemainder} mies.)`
-                : "-"}
-            </Text>
-            <Text size="sm">
-              Całkowite odsetki: {formatCurrency(result.totalInterestPaid)}
-            </Text>
-            <Text size="sm">
-              Całkowita spłacona kwota: {formatCurrency(result.totalPaid)}
-            </Text>
-          </Group>
+          <SimpleGrid cols={{ base: 1, md: 3 }}>
+            <Stack align="center" gap="0">
+              <Text size="md">Całkowite odsetki</Text>
+              <Text size="lg" fw="bold">
+                {formatCurrency(result.totalInterestPaid)}
+              </Text>
+            </Stack>
+
+            <Stack align="center" gap="0">
+              <Text size="md">Całkowita spłacona kwota</Text>
+              <Text size="lg" fw="bold">
+                {formatCurrency(result.totalPaid)}
+              </Text>
+            </Stack>
+
+            <Stack align="center" gap="0" bd={1}>
+              <Text size="md">Procent odsetek</Text>
+              <Text size="lg" fw="bold">
+                {((result.totalInterestPaid / result.totalPaid) * 100).toFixed(
+                  2
+                )}
+                %
+              </Text>
+            </Stack>
+          </SimpleGrid>
         </Stack>
       </Card>
     </SimpleGrid>
