@@ -4,14 +4,23 @@ import { useHoverState } from "./hover-state";
 import { Stack, Title } from "@mantine/core";
 
 const PieChartForRow = () => {
-  const { interest, overpayment, principal } = useHoverState(
+  const { interest, overpayment, principal, payment, month } = useHoverState(
     (s) => s.hoveredRow
   );
+
+  // calculate percentages
+  if (payment === 0) {
+    return null;
+  }
+
+  const interestPercentage = (interest / payment) * 100;
+  const principalPercentage = (principal / payment) * 100;
+  const overpaymentPercentage = (overpayment / payment) * 100;
 
   return (
     <Stack>
       <Title order={4} style={{ textAlign: "center" }}>
-        Szczegóły miesiąca {useHoverState((s) => s.hoveredRow.month)}
+        Szczegóły miesiąca {month}
       </Title>
       <PieChart
         withLabels
@@ -21,17 +30,17 @@ const PieChartForRow = () => {
         size={300}
         data={[
           {
-            name: "Spłata kapitału",
+            name: `Spłata kapitału ${principalPercentage.toFixed(1)}%`,
             value: principal,
             color: "indigo.6"
           },
           {
-            name: "Odsetki",
+            name: `Odsetki ${interestPercentage.toFixed(1)}%`,
             value: interest,
             color: "red.6"
           },
           {
-            name: "Nadpłata",
+            name: `Nadpłata ${overpaymentPercentage.toFixed(1)}%`,
             value: overpayment,
             color: "teal.6"
           }

@@ -1,11 +1,11 @@
 import {
   Divider,
-  // Group,
   Stack,
   Text,
   Title,
   Card,
-  SimpleGrid
+  SimpleGrid,
+  Alert
 } from "@mantine/core";
 import type { LoanComputationResult } from "./loanCalculations";
 import { formatCurrency } from "./utils";
@@ -37,29 +37,32 @@ const Summary = ({ result }: Props) => {
       <Card withBorder padding="md">
         <Stack gap="sm">
           <Title order={3}>Wizualizacja spłaty kredytu</Title>
-          <AreaChart
-            h={300}
-            data={chartData}
-            dataKey="date"
-            series={[
-              { name: "payment", color: "gray.6", label: "Miesięczna rata" },
-              {
-                name: "interest",
-                color: "red.6",
-                label: "Odsetki"
-              },
-              {
-                name: "principalAndOverpayment",
-                color: "indigo.6",
-                label: "Kapitał i nadpłata"
-              }
-            ]}
-            curveType="monotone"
-            withLegend={true}
-            xAxisProps={{ hide: true }}
-            yAxisProps={{ hide: true }}
-            dotProps={{ display: "none" }}
-          />
+          {result.schedule.length < 600 ? (
+            <AreaChart
+              h={300}
+              data={chartData}
+              dataKey="date"
+              series={[
+                { name: "payment", color: "gray.6", label: "Miesięczna rata" },
+                { name: "interest", color: "red.6", label: "Odsetki" },
+                {
+                  name: "principalAndOverpayment",
+                  color: "indigo.6",
+                  label: "Kapitał i nadpłata"
+                }
+              ]}
+              curveType="monotone"
+              withLegend={true}
+              xAxisProps={{ hide: true }}
+              yAxisProps={{ hide: true }}
+              dotProps={{ display: "none" }}
+            />
+          ) : (
+            <Alert title="Wizualizacja niedostępna" color="yellow">
+              Ze względu na dużą liczbę rat (powyżej 600) wizualizacja spłaty
+              kredytu została wyłączona. Zawęż parametry, aby ją zobaczyć.
+            </Alert>
+          )}
         </Stack>
       </Card>
 
