@@ -40,6 +40,7 @@ function App() {
   const [annualInterest, setAnnualInterest] = useState<number | "">(6);
   const [years, setYears] = useState<number | "">(30);
   const [overpayment, setOverpayment] = useState<number | "">(1_400);
+  const [isFixedRate, setIsFixedRate] = useState<boolean>(false);
 
   const numericPrincipal = typeof principal === "number" ? principal : 0;
   const numericAnnualInterest =
@@ -52,9 +53,16 @@ function App() {
         principal: numericPrincipal,
         annualInterestRate: numericAnnualInterest,
         years: numericYears,
-        monthlyOverpayment: Number(overpayment)
+        monthlyOverpayment: Number(overpayment),
+        isFixedRate
       }),
-    [numericPrincipal, numericAnnualInterest, numericYears, overpayment]
+    [
+      numericPrincipal,
+      numericAnnualInterest,
+      numericYears,
+      overpayment,
+      isFixedRate
+    ]
   );
 
   useEffect(() => {
@@ -109,10 +117,9 @@ function App() {
                 step={100}
               />
               <Checkbox
-                checked={true}
-                onChange={console.log}
+                checked={isFixedRate}
+                onChange={(e) => setIsFixedRate(e.currentTarget.checked)}
                 label="Stałe oprocentowanie"
-                disabled
                 m="xs"
               />
             </SimpleGrid>
@@ -125,18 +132,18 @@ function App() {
           <Stack gap="md">
             <Title order={3}>Harmonogram spłat</Title>
 
-            <Grid>
-              <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>
-                <ScheduleTable schedule={result.schedule} />
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, md: 4, lg: 4 }}>
-                <Center h="100%">
-                  <PieChartForRow />
-                </Center>
-              </Grid.Col>
-            </Grid>
-
-            {result.schedule.length > 600 && (
+            {result.schedule.length < 600 ? (
+              <Grid>
+                <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>
+                  <ScheduleTable schedule={result.schedule} />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 4, lg: 4 }}>
+                  <Center h="100%">
+                    <PieChartForRow />
+                  </Center>
+                </Grid.Col>
+              </Grid>
+            ) : (
               <Text size="xs" c="dimmed">
                 Wyświetlono pierwsze 600 rat. Zawęż parametry, aby zobaczyć
                 pełny harmonogram.

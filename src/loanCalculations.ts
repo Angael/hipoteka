@@ -3,6 +3,7 @@ export interface LoanParameters {
   annualInterestRate: number; // expressed as percentage, e.g. 6.5 for 6.5%
   years: number; // loan duration in years
   monthlyOverpayment?: number; // optional extra payment added on top of the regular instalment
+  isFixedRate: boolean; // if true, every payment is the same except possibly the last one
 }
 
 export interface AmortizationRow {
@@ -59,7 +60,8 @@ export function generateAmortizationSchedule({
   principal,
   annualInterestRate,
   years,
-  monthlyOverpayment = 0
+  monthlyOverpayment = 0,
+  isFixedRate
 }: LoanParameters): LoanComputationResult {
   if (!(principal > 0) || !(years > 0)) {
     return {
