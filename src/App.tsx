@@ -41,6 +41,7 @@ function App() {
   const [years, setYears] = useState<number | "">(30);
   const [overpayment, setOverpayment] = useState<number | "">(1_400);
   const [isFixedRate, setIsFixedRate] = useState<boolean>(false);
+  const [areFallingRates, setAreFallingRates] = useState<boolean>(false);
 
   const numericPrincipal = typeof principal === "number" ? principal : 0;
   const numericAnnualInterest =
@@ -120,6 +121,12 @@ function App() {
                 checked={isFixedRate}
                 onChange={(e) => setIsFixedRate(e.currentTarget.checked)}
                 label="Stałe oprocentowanie"
+                m="xs"
+              />
+              <Checkbox
+                checked={areFallingRates}
+                onChange={(e) => setAreFallingRates(e.currentTarget.checked)}
+                label="Malejace raty"
                 m="xs"
               />
             </SimpleGrid>
