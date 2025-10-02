@@ -78,12 +78,14 @@ const Summary = ({ result }: Props) => {
               </Text>
             </Text>
 
-            <Text c="dimmed" size="sm">
-              Podstawowa rata (bez nadpłaty):{" "}
-              <Text span fw={600}>
-                {formatCurrency(result.monthlyPayment)}
+            {result.actualFirstPayment !== result.monthlyPayment && (
+              <Text c="dimmed" size="sm">
+                Podstawowa rata (bez nadpłaty):{" "}
+                <Text span fw={600}>
+                  {formatCurrency(result.monthlyPayment)}
+                </Text>
               </Text>
-            </Text>
+            )}
           </div>
 
           <Text size="md">
