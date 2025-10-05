@@ -39,9 +39,8 @@ function App() {
   const [principal, setPrincipal] = useState<number | "">(580_000);
   const [annualInterest, setAnnualInterest] = useState<number | "">(6);
   const [years, setYears] = useState<number | "">(30);
-  const [overpayment, setOverpayment] = useState<number | "">(1_400);
-  const [isFixedRate, setIsFixedRate] = useState<boolean>(false);
-  const [areFallingRates, setAreFallingRates] = useState<boolean>(false);
+  const [overpayment, setOverpayment] = useState<number | "">(0);
+  const [isFallingRates, setIsFallingRates] = useState<boolean>(false);
 
   const numericPrincipal = typeof principal === "number" ? principal : 0;
   const numericAnnualInterest =
@@ -55,14 +54,14 @@ function App() {
         annualInterestRate: numericAnnualInterest,
         years: numericYears,
         monthlyOverpayment: Number(overpayment),
-        isFixedRate
+        isFallingRates
       }),
     [
       numericPrincipal,
       numericAnnualInterest,
       numericYears,
       overpayment,
-      isFixedRate
+      isFallingRates
     ]
   );
 
@@ -118,14 +117,8 @@ function App() {
                 step={100}
               />
               <Checkbox
-                checked={isFixedRate}
-                onChange={(e) => setIsFixedRate(e.currentTarget.checked)}
-                label="Stałe oprocentowanie"
-                m="xs"
-              />
-              <Checkbox
-                checked={areFallingRates}
-                onChange={(e) => setAreFallingRates(e.currentTarget.checked)}
+                checked={isFallingRates}
+                onChange={(e) => setIsFallingRates(e.currentTarget.checked)}
                 label="Malejace raty"
                 m="xs"
               />

@@ -28,23 +28,25 @@ const PieChartForRow = () => {
         labelsPosition="inside"
         labelsType="value"
         size={300}
-        data={[
-          {
-            name: `Spłata kapitału ${principalPercentage.toFixed(1)}%`,
-            value: principal,
-            color: "indigo.6"
-          },
-          {
-            name: `Odsetki ${interestPercentage.toFixed(1)}%`,
-            value: interest,
-            color: "red.6"
-          },
-          {
-            name: `Nadpłata ${overpaymentPercentage.toFixed(1)}%`,
-            value: overpayment,
-            color: "teal.6"
-          }
-        ]}
+        data={
+          [
+            principal && {
+              name: `Spłata kapitału ${principalPercentage.toFixed(1)}%`,
+              value: principal,
+              color: "indigo.6"
+            },
+            interestPercentage && {
+              name: `Odsetki ${interestPercentage.toFixed(1)}%`,
+              value: interest,
+              color: "red.6"
+            },
+            overpayment && {
+              name: `Nadpłata ${overpaymentPercentage.toFixed(1)}%`,
+              value: overpayment,
+              color: "teal.6"
+            }
+          ].filter(Boolean) as { name: string; value: number; color: string }[]
+        }
         withTooltip
         tooltipDataSource="segment"
         mx="auto"
