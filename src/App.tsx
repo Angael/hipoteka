@@ -10,37 +10,27 @@ import {
   Text,
   Title
 } from "@mantine/core";
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useHoverState } from "./hover-state";
 import { generateAmortizationSchedule } from "./loanCalculations";
 import PieChartForRow from "./PieChartForRow";
 import ScheduleTable from "./ScheduleTable";
 import Summary from "./Summary";
-
-const createNumberInputChangeHandler =
-  (setter: (value: number | "") => void) => (value: string | number) =>
-    startTransition(() => {
-      if (value === "") {
-        setter("");
-        return;
-      }
-
-      if (typeof value === "number") {
-        setter(Number.isFinite(value) ? value : "");
-        return;
-      }
-
-      const normalized = value.replace(/\s/g, "").replace(",", ".");
-      const parsed = Number(normalized);
-      setter(Number.isFinite(parsed) ? parsed : "");
-    });
+import { useDefferedInputState } from "./utils";
 
 function App() {
-  const [principal, setPrincipal] = useState<number | "">(580_000);
-  const [annualInterest, setAnnualInterest] = useState<number | "">(6);
-  const [years, setYears] = useState<number | "">(30);
-  const [overpayment, setOverpayment] = useState<number | "">(0);
-  const [isFallingRates, setIsFallingRates] = useState<boolean>(false);
+  const [principal, principalProps] = useDefferedInputState<number | string>(
+    580_000
+  );
+  const [annualInterest, annualInterestProps] = useDefferedInputState<
+    number | string
+  >(6);
+  const [years, yearsProps] = useDefferedInputState<number | string>(30);
+  const [overpayment, overpaymentProps] = useDefferedInputState<
+    number | string
+  >(0);
+  const [isFallingRates, isFallingRatesProps] =
+    useDefferedInputState<boolean>(false);
 
   const numericPrincipal = typeof principal === "number" ? principal : 0;
   const numericAnnualInterest =
@@ -90,35 +80,33 @@ function App() {
             <SimpleGrid cols={{ xs: 1, sm: 2, md: 4 }} spacing="lg">
               <NumberInput
                 label="Kwota kredytu (PLN)"
-                value={principal}
-                onChange={createNumberInputChangeHandler(setPrincipal)}
+                {...principalProps}
                 min={0}
                 step={1_000}
               />
               <NumberInput
                 label="Oprocentowanie roczne (%)"
-                value={annualInterest}
-                onChange={createNumberInputChangeHandler(setAnnualInterest)}
+                {...annualInterestProps}
                 min={0}
                 step={0.1}
               />
               <NumberInput
                 label="Okres kredytowania (lata)"
-                value={years}
-                onChange={createNumberInputChangeHandler(setYears)}
+                {...yearsProps}
                 min={1}
                 step={1}
               />
               <NumberInput
                 label="Miesięczna nadpłata (PLN)"
-                value={overpayment}
-                onChange={createNumberInputChangeHandler(setOverpayment)}
+                {...overpaymentProps}
                 min={0}
                 step={100}
               />
               <Checkbox
-                checked={isFallingRates}
-                onChange={(e) => setIsFallingRates(e.currentTarget.checked)}
+                checked={isFallingRatesProps.value}
+                onChange={(e) =>
+                  isFallingRatesProps.onChange(e.currentTarget.checked)
+                }
                 label="Malejace raty"
                 m="xs"
               />
