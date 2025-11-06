@@ -1,5 +1,5 @@
 # Stage 1 - Build app with bun
-FROM oven/bun:latest AS builder
+FROM oven/bun AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
-RUN bun run build
+RUN bun --bun run build
 
 # Stage 2 - Serve app with nginx server
 FROM nginx:stable-alpine3.21 AS final
