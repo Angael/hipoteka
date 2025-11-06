@@ -1,7 +1,8 @@
-# .dockerignore for a Vite app run by bun
+# .dockerignore for a Vite app built with pnpm
 
 # Don't copy host-installed deps; install inside the image
 node_modules
+pnpm-store
 
 # Build/artifacts
 dist
@@ -11,6 +12,7 @@ build
 
 # Caches
 .cache
+# Bun cache (not used now, but keep excluded)
 .bun
 
 # Logs
