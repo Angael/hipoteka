@@ -1,29 +1,15 @@
-###############################
 # Stage 1: Build with Node + pnpm
-###############################
-FROM node:20-alpine AS builder
+FROM oven/bun:alpine AS builder
 
-ENV CI=1
 WORKDIR /app
 
-# Enable corepack to use pnpm without global install
-RUN corepack enable
-
-# Copy only dependency manifests first for better layer caching
-COPY package.json pnpm-lock.yaml* ./
-
-# Install deps (prefer lockfile; if missing, fall back without --frozen-lockfile)
-RUN if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
-
-# Copy source
+COPY package.json bun.lock* ./
+RUN bun i
 COPY . .
+RUN bun -v
+RUN bun run build
 
-# Build (TypeScript + Vite)
-RUN pnpm build
-
-###############################
 # Stage 2: Serve static build with nginx
-###############################
 FROM nginx:stable-alpine3.21 AS final
 
 WORKDIR /usr/share/nginx/html
