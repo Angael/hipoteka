@@ -7,6 +7,7 @@ import {
   NumberInput,
   SimpleGrid,
   Stack,
+  Tabs,
   Text,
   Title
 } from "@mantine/core";
@@ -114,31 +115,43 @@ function App() {
           </Stack>
         </Card>
 
-        <Summary result={result} />
+        <Tabs defaultValue="summary">
+          <Tabs.List>
+            <Tabs.Tab value="summary">Podsumowanie</Tabs.Tab>
+            <Tabs.Tab value="ikze">Porównanie z IKZE</Tabs.Tab>
+            <Tabs.Tab value="single_payment">Pojedyńcza nadpłata</Tabs.Tab>
+          </Tabs.List>
 
-        <Card withBorder padding="md">
-          <Stack gap="md">
-            <Title order={3}>Harmonogram spłat</Title>
+          <Tabs.Panel value="summary" mt="sm">
+            <Summary result={result} />
 
-            {result.schedule.length < 600 ? (
-              <Grid>
-                <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>
-                  <ScheduleTable schedule={result.schedule} />
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, md: 4, lg: 4 }}>
-                  <Center h="100%">
-                    <PieChartForRow />
-                  </Center>
-                </Grid.Col>
-              </Grid>
-            ) : (
-              <Text size="xs" c="dimmed">
-                Wyświetlono pierwsze 600 rat. Zawęż parametry, aby zobaczyć
-                pełny harmonogram.
-              </Text>
-            )}
-          </Stack>
-        </Card>
+            <Card withBorder padding="md">
+              <Stack gap="md">
+                <Title order={3}>Harmonogram spłat</Title>
+
+                {result.schedule.length < 600 ? (
+                  <Grid>
+                    <Grid.Col span={{ base: 12, md: 8, lg: 8 }}>
+                      <ScheduleTable schedule={result.schedule} />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 4, lg: 4 }}>
+                      <Center h="100%">
+                        <PieChartForRow />
+                      </Center>
+                    </Grid.Col>
+                  </Grid>
+                ) : (
+                  <Text size="xs" c="dimmed">
+                    Wyświetlono pierwsze 600 rat. Zawęż parametry, aby zobaczyć
+                    pełny harmonogram.
+                  </Text>
+                )}
+              </Stack>
+            </Card>
+          </Tabs.Panel>
+          <Tabs.Panel value="ikze">Porównanie z IKZE</Tabs.Panel>
+          <Tabs.Panel value="single_payment">Pojedyńcza nadpłata</Tabs.Panel>
+        </Tabs>
       </Stack>
     </Container>
   );
