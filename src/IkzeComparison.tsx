@@ -207,6 +207,7 @@ const IkzeComparison = ({ parameters }: Props) => {
           h={300}
           data={result.chartData}
           dataKey="year"
+          valueFormatter={formatCurrency}
           series={[
             { name: "overpaymentBenefit", label: "Nadpłata", color: "blue.7" },
             { name: "ikzeBenefit", label: "IKZE", color: "teal.7" }
