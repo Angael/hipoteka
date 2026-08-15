@@ -131,7 +131,7 @@ const IkzeComparison = ({ parameters }: Props) => {
           decimalScale={2}
         />
         <NumberInput
-          label="Roczny dochód do opodatkowania (PLN)"
+          label="Roczny dochód po kosztach i składkach, przed ulgą IKZE (PLN)"
           value={taxableIncome}
           onChange={setTaxableIncome}
           min={0}
