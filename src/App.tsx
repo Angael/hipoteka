@@ -106,7 +106,7 @@ function App() {
   const [additionalCost, additionalCostProps] =
     useDefferedInputState<number | string>(232);
   const [overpayment, overpaymentProps] =
-    useDefferedInputState<number | string>(0);
+    useDefferedInputState<number | string>(1_400);
   const [plannedPrincipal, plannedPrincipalProps] =
     useDefferedInputState<number | string>(500_000);
   const [plannedInterest, plannedInterestProps] =
@@ -116,7 +116,7 @@ function App() {
   const [plannedCost, plannedCostProps] =
     useDefferedInputState<number | string>(0);
   const [plannedOverpayment, plannedOverpaymentProps] =
-    useDefferedInputState<number | string>(0);
+    useDefferedInputState<number | string>(1_400);
   const [isFallingRates, isFallingRatesProps] =
     useDefferedInputState<boolean>(false);
 
