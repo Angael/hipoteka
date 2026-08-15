@@ -4,9 +4,14 @@ import { useHoverState } from "./hover-state";
 import { Stack, Title } from "@mantine/core";
 
 const PieChartForRow = () => {
-  const { interest, overpayment, principal, payment, month } = useHoverState(
-    (s) => s.hoveredRow
-  );
+  const {
+    interest,
+    overpayment,
+    principal,
+    additionalCost,
+    payment,
+    month
+  } = useHoverState((s) => s.hoveredRow);
 
   // calculate percentages
   if (payment === 0) {
@@ -16,6 +21,7 @@ const PieChartForRow = () => {
   const interestPercentage = (interest / payment) * 100;
   const principalPercentage = (principal / payment) * 100;
   const overpaymentPercentage = (overpayment / payment) * 100;
+  const additionalCostPercentage = (additionalCost / payment) * 100;
 
   return (
     <Stack>
@@ -44,6 +50,11 @@ const PieChartForRow = () => {
               name: `Nadpłata ${overpaymentPercentage.toFixed(1)}%`,
               value: overpayment,
               color: "teal.6"
+            },
+            additionalCost && {
+              name: `Koszty dodatkowe ${additionalCostPercentage.toFixed(1)}%`,
+              value: additionalCost,
+              color: "orange.6"
             }
           ].filter(Boolean) as { name: string; value: number; color: string }[]
         }

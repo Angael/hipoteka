@@ -8,6 +8,7 @@ const initState: AmortizationRow = {
   interest: 0,
   principal: 0,
   overpayment: 0,
+  additionalCost: 0,
   remainingBalance: 0
 };
 

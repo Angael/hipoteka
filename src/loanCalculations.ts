@@ -1,9 +1,12 @@
 export interface LoanParameters {
   principal: number;
-  annualInterestRate: number; // expressed as percentage, e.g. 6.5 for 6.5%
-  years: number; // loan duration in years
-  monthlyOverpayment?: number; // optional extra payment added on top of the regular instalment
-  isFallingRates: boolean; // if true, instalments decrease because the capital part stays constant (malejące raty)
+  annualInterestRate: number;
+  termMonths: number;
+  monthlyOverpayment?: number;
+  monthlyAdditionalCost?: number;
+  scheduledPayment?: number;
+  firstInstallmentInterest?: number;
+  isFallingRates: boolean;
 }
 
 export interface AmortizationRow {
@@ -13,6 +16,7 @@ export interface AmortizationRow {
   interest: number;
   principal: number;
   overpayment: number;
+  additionalCost: number;
   remainingBalance: number;
 }
 
@@ -52,10 +56,12 @@ interface BaseScheduleParams {
   monthlyRate: number;
   totalMonths: number;
   extraPayment: number;
+  additionalCost: number;
 }
 
 interface AnnuityScheduleParams extends BaseScheduleParams {
   minPayment: number;
+  firstInstallmentInterest?: number;
 }
 
 type ScheduleComputation = Pick<
@@ -64,7 +70,7 @@ type ScheduleComputation = Pick<
 >;
 
 const createAccumulator = (principal: number): ScheduleAccumulator => ({
-  balance: principal,
+  balance: toCents(principal),
   month: 0,
   totalInterestPaid: 0,
   totalPaid: 0,
@@ -82,6 +88,7 @@ const recordPayment = (
     interest: number;
     principal: number;
     overpayment: number;
+    additionalCost: number;
   }
 ) => {
   acc.schedule.push({
@@ -91,6 +98,7 @@ const recordPayment = (
     interest: toCents(payload.interest),
     principal: toCents(payload.principal),
     overpayment: toCents(payload.overpayment),
+    additionalCost: toCents(payload.additionalCost),
     remainingBalance: toCents(acc.balance)
   });
 };
@@ -120,7 +128,9 @@ function generateAnnuitySchedule({
   monthlyRate,
   totalMonths,
   extraPayment,
-  minPayment
+  additionalCost,
+  minPayment,
+  firstInstallmentInterest
 }: AnnuityScheduleParams): ScheduleComputation {
   const acc = createAccumulator(principal);
   const safetyCap = safetyCapFor(totalMonths);
@@ -128,18 +138,30 @@ function generateAnnuitySchedule({
   while (acc.balance > DEFAULT_TOLERANCE && acc.month < safetyCap) {
     acc.month += 1;
 
-    const interestPayment = monthlyRate === 0 ? 0 : acc.balance * monthlyRate;
-    let principalPayment = minPayment - interestPayment;
+    const interestPayment = toCents(
+      acc.month === 1 &&
+        firstInstallmentInterest !== undefined &&
+        firstInstallmentInterest > 0
+        ? firstInstallmentInterest
+        : monthlyRate === 0
+          ? 0
+          : acc.balance * monthlyRate
+    );
+    let principalPayment = toCents(minPayment - interestPayment);
     if (principalPayment < 0) {
       principalPayment = 0;
     }
 
-    let appliedOverpayment = extraPayment;
-    let totalPrincipalThisMonth = principalPayment + appliedOverpayment;
+    let appliedOverpayment = toCents(extraPayment);
+    let totalPrincipalThisMonth = toCents(
+      principalPayment + appliedOverpayment
+    );
 
     if (monthlyRate === 0) {
       principalPayment = minPayment;
-      totalPrincipalThisMonth = principalPayment + appliedOverpayment;
+      totalPrincipalThisMonth = toCents(
+        principalPayment + appliedOverpayment
+      );
     }
 
     if (totalPrincipalThisMonth > acc.balance) {
@@ -149,9 +171,12 @@ function generateAnnuitySchedule({
       principalPayment = totalPrincipalThisMonth - appliedOverpayment;
     }
 
-    const totalPayment = interestPayment + totalPrincipalThisMonth;
+    const totalPayment =
+      interestPayment + totalPrincipalThisMonth + additionalCost;
 
-    acc.balance = Math.max(acc.balance - totalPrincipalThisMonth, 0);
+    acc.balance = toCents(
+      Math.max(acc.balance - totalPrincipalThisMonth, 0)
+    );
     acc.totalInterestPaid += interestPayment;
     acc.totalPaid += totalPayment;
 
@@ -159,7 +184,8 @@ function generateAnnuitySchedule({
       payment: totalPayment,
       interest: interestPayment,
       principal: principalPayment,
-      overpayment: appliedOverpayment
+      overpayment: appliedOverpayment,
+      additionalCost
     });
 
     if (acc.balance <= DEFAULT_TOLERANCE) {
@@ -179,23 +205,28 @@ function generateFallingRateSchedule({
   principal,
   monthlyRate,
   totalMonths,
-  extraPayment
+  extraPayment,
+  additionalCost
 }: BaseScheduleParams): ScheduleComputation {
   const acc = createAccumulator(principal);
   const safetyCap = safetyCapFor(totalMonths);
-  const basePrincipalPayment = principal / totalMonths;
+  const basePrincipalPayment = toCents(principal / totalMonths);
 
   while (acc.balance > DEFAULT_TOLERANCE && acc.month < safetyCap) {
     acc.month += 1;
 
-    const interestPayment = monthlyRate === 0 ? 0 : acc.balance * monthlyRate;
+    const interestPayment = toCents(
+      monthlyRate === 0 ? 0 : acc.balance * monthlyRate
+    );
     let principalPayment = basePrincipalPayment;
     if (principalPayment > acc.balance) {
       principalPayment = acc.balance;
     }
 
-    let appliedOverpayment = extraPayment;
-    let totalPrincipalThisMonth = principalPayment + appliedOverpayment;
+    let appliedOverpayment = toCents(extraPayment);
+    let totalPrincipalThisMonth = toCents(
+      principalPayment + appliedOverpayment
+    );
 
     if (totalPrincipalThisMonth > acc.balance) {
       const excess = totalPrincipalThisMonth - acc.balance;
@@ -204,9 +235,12 @@ function generateFallingRateSchedule({
       principalPayment = totalPrincipalThisMonth - appliedOverpayment;
     }
 
-    const totalPayment = interestPayment + totalPrincipalThisMonth;
+    const totalPayment =
+      interestPayment + totalPrincipalThisMonth + additionalCost;
 
-    acc.balance = Math.max(acc.balance - totalPrincipalThisMonth, 0);
+    acc.balance = toCents(
+      Math.max(acc.balance - totalPrincipalThisMonth, 0)
+    );
     acc.totalInterestPaid += interestPayment;
     acc.totalPaid += totalPayment;
 
@@ -214,7 +248,8 @@ function generateFallingRateSchedule({
       payment: totalPayment,
       interest: interestPayment,
       principal: principalPayment,
-      overpayment: appliedOverpayment
+      overpayment: appliedOverpayment,
+      additionalCost
     });
 
     if (acc.balance <= DEFAULT_TOLERANCE) {
@@ -233,11 +268,14 @@ function generateFallingRateSchedule({
 export function generateAmortizationSchedule({
   principal,
   annualInterestRate,
-  years,
+  termMonths,
   monthlyOverpayment = 0,
+  monthlyAdditionalCost = 0,
+  scheduledPayment,
+  firstInstallmentInterest,
   isFallingRates
 }: LoanParameters): LoanComputationResult {
-  if (!(principal > 0) || !(years > 0)) {
+  if (!(principal > 0) || !(termMonths > 0)) {
     return {
       monthlyPayment: 0,
       actualFirstPayment: 0,
@@ -249,35 +287,40 @@ export function generateAmortizationSchedule({
     };
   }
 
-  const totalMonths = Math.max(Math.round(years * 12), 1);
+  const totalMonths = Math.max(Math.round(termMonths), 1);
   const monthlyRate = annualInterestRate / 12 / 100;
-  const baseMonthlyPayment = calculateMonthlyPayment(
-    principal,
-    annualInterestRate,
-    totalMonths
-  );
+  const baseMonthlyPayment =
+    scheduledPayment && scheduledPayment > 0
+      ? scheduledPayment
+      : calculateMonthlyPayment(principal, annualInterestRate, totalMonths);
   const minPayment = toCents(baseMonthlyPayment);
   const extraPayment = Math.max(monthlyOverpayment ?? 0, 0);
+  const additionalCost = Math.max(monthlyAdditionalCost ?? 0, 0);
 
   const computation = isFallingRates
     ? generateFallingRateSchedule({
         principal,
         monthlyRate,
         totalMonths,
-        extraPayment
+        extraPayment,
+        additionalCost
       })
     : generateAnnuitySchedule({
         principal,
         monthlyRate,
         totalMonths,
         extraPayment,
-        minPayment
+        additionalCost,
+        minPayment,
+        firstInstallmentInterest
       });
 
   const { schedule, totalInterestPaid, totalPaid } = computation;
   const firstPayment = schedule[0] ?? null;
   const baseFirstPayment = firstPayment
-    ? firstPayment.payment - firstPayment.overpayment
+    ? firstPayment.payment -
+      firstPayment.overpayment -
+      firstPayment.additionalCost
     : 0;
 
   return {

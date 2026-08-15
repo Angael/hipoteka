@@ -27,7 +27,8 @@ const Summary = ({ result }: Props) => {
         payment: Math.round(element.payment),
         interest: Math.round(element.interest),
         principalAndOverpayment:
-          Math.round(element.principal) + Math.round(element.overpayment)
+          Math.round(element.principal) + Math.round(element.overpayment),
+        additionalCost: Math.round(element.additionalCost)
       })),
     [result]
   );
@@ -49,6 +50,11 @@ const Summary = ({ result }: Props) => {
                   name: "principalAndOverpayment",
                   color: "indigo.6",
                   label: "Kapitał i nadpłata"
+                },
+                {
+                  name: "additionalCost",
+                  color: "orange.6",
+                  label: "Koszty dodatkowe"
                 }
               ]}
               curveType="monotone"
@@ -72,7 +78,7 @@ const Summary = ({ result }: Props) => {
 
           <div>
             <Text size="md">
-              Miesięczna rata (z nadpłatą):{" "}
+              Pierwsza rata łącznie:{" "}
               <Text span fw={600}>
                 {formatCurrency(result.actualFirstPayment)}
               </Text>
@@ -80,7 +86,7 @@ const Summary = ({ result }: Props) => {
 
             {result.actualFirstPayment !== result.monthlyPayment && (
               <Text c="dimmed" size="sm">
-                Podstawowa rata (bez nadpłaty):{" "}
+                Rata kapitałowo-odsetkowa:{" "}
                 <Text span fw={600}>
                   {formatCurrency(result.monthlyPayment)}
                 </Text>
@@ -105,7 +111,7 @@ const Summary = ({ result }: Props) => {
             </Stack>
 
             <Stack align="center" gap="0">
-              <Text size="md">Całkowita spłacona kwota</Text>
+              <Text size="md">Całkowita kwota rat</Text>
               <Text size="lg" fw="bold">
                 {formatCurrency(result.totalPaid)}
               </Text>

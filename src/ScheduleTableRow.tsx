@@ -21,6 +21,7 @@ const ScheduleTableRow = ({ row, isHovered, onMouseEnter }: Props) => {
       <Table.Td>{formatCurrency(row.payment)}</Table.Td>
       <Table.Td>{formatCurrency(row.principal)}</Table.Td>
       <Table.Td>{formatCurrency(row.interest)}</Table.Td>
+      <Table.Td>{formatCurrency(row.additionalCost)}</Table.Td>
       <Table.Td>{formatCurrency(row.overpayment)}</Table.Td>
     </Table.Tr>
   );

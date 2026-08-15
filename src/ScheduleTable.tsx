@@ -18,16 +18,17 @@ const ScheduleTable = ({ schedule }: Props) => {
           <Table.Tr>
             <Table.Th>Miesiąc</Table.Th>
             <Table.Th>Pozostały kapitał</Table.Th>
-            <Table.Th>Rata</Table.Th>
+            <Table.Th>Rata łącznie</Table.Th>
             <Table.Th>Spłata kapitału</Table.Th>
             <Table.Th>Odsetki</Table.Th>
+            <Table.Th>Koszty dodatkowe</Table.Th>
             <Table.Th>Nadpłata</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {schedule.length === 0 ? (
             <Table.Tr>
-              <Table.Td colSpan={6}>
+              <Table.Td colSpan={7}>
                 <Text ta="center" c="dimmed">
                   Uzupełnij dane kredytu, aby zobaczyć harmonogram.
                 </Text>
